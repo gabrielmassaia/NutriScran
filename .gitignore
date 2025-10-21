@@ -5,6 +5,10 @@ out/
 .env
 .env.local
 .env.*
+
+!.env.example
+!.env.local.example
+
 *.log
 *.lock
 .DS_Store
