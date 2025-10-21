@@ -1,0 +1,20 @@
+node_modules/
+.npm/
+.next/
+out/
+.env
+.env.local
+.env.*
+*.log
+*.lock
+.DS_Store
+coverage/
+
+# .NET
+bin/
+obj/
+*.user
+*.swp
+
+# Supabase
+supabase/.branches
