@@ -1,0 +1,35 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  color-scheme: light;
+  --nutriscan-primary: #2f855a;
+  --nutriscan-secondary: #38a169;
+  --nutriscan-bg: #f7fafc;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--nutriscan-bg);
+  color: #1a202c;
+}
+
+main {
+  min-height: 100vh;
+}
+
+.btn-nutriscan {
+  background: linear-gradient(135deg, var(--nutriscan-primary), var(--nutriscan-secondary));
+  border: none;
+  color: #fff;
+}
+
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
