@@ -2,23 +2,46 @@
 set -e
 
 echo "🚀 Iniciando setup do projeto NutriScan..."
+echo "------------------------------------------"
 
 # --- FRONTEND ---
-echo "📦 Criando projeto Next.js 16..."
-npx create-next-app@latest nutriscan-frontend --ts --use-npm --app
+if [ ! -d "nutriscan-frontend" ]; then
+  echo "📦 Criando projeto Next.js 16..."
+  npx create-next-app@latest nutriscan-frontend --ts --use-npm --app
+else
+  echo "⚠️ Diretório 'nutriscan-frontend' já existe, pulando criação..."
+fi
+
+echo "📦 Instalando dependências do frontend..."
 cd nutriscan-frontend
-npm install @supabase/supabase-js axios zxing-js/browser recharts @tanstack/react-query bootstrap
-cat > .env.local.example <<'EON'
+npm install @supabase/supabase-js axios @zxing/browser recharts @tanstack/react-query bootstrap
+
+
+# Gera o .env.local.example apenas se não existir
+if [ ! -f ".env.local.example" ]; then
+  echo "🧩 Gerando .env.local.example..."
+  cat > .env.local.example <<'EON'
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR-ANON-KEY
 NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
 EON
+else
+  echo "ℹ️  .env.local.example já existe, mantendo o arquivo atual."
+fi
+
 cd ..
 
 # --- BACKEND ---
-echo "⚙️ Criando API .NET 8..."
-dotnet new webapi -n NutriScan.Api
+if [ ! -d "NutriScan.Api" ]; then
+  echo "⚙️ Criando API .NET 8..."
+  dotnet new webapi -n NutriScan.Api
+else
+  echo "⚠️ Diretório 'NutriScan.Api' já existe, pulando criação..."
+fi
+
 cd NutriScan.Api
+
+echo "⚙️ Instalando pacotes .NET..."
 dotnet add package MongoDB.Driver
 dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 dotnet add package Newtonsoft.Json
@@ -26,7 +49,11 @@ dotnet add package RestSharp
 dotnet add package AutoMapper
 
 mkdir -p Seed
-cat > .env.example <<'EON'
+
+# Gera o .env.example se não existir
+if [ ! -f ".env.example" ]; then
+  echo "🧩 Gerando .env.example do backend..."
+  cat > .env.example <<'EON'
 ASPNETCORE_URLS=http://0.0.0.0:5000
 MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net
 MONGODB_DB=nutriscan
@@ -41,11 +68,17 @@ SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
 OPENFOODFACTS_API_BASE=https://world.openfoodfacts.org/api/v2/product/
 SEED=true
 EON
+else
+  echo "ℹ️  .env.example do backend já existe, mantendo o arquivo atual."
+fi
+
 cd ..
 
 # --- DOCS ---
 mkdir -p docs
-cat > docs/api.http <<'EON'
+if [ ! -f "docs/api.http" ]; then
+  echo "📜 Criando arquivo de documentação REST (api.http)..."
+  cat > docs/api.http <<'EON'
 ### Buscar produto por barcode
 GET http://localhost:5000/api/products/7891000055123
 
@@ -76,34 +109,14 @@ GET http://localhost:5000/api/users/11111111-1111-1111-1111-111111111111/logs
 ### Stats do usuário
 GET http://localhost:5000/api/stats/11111111-1111-1111-1111-111111111111
 EON
+else
+  echo "ℹ️  docs/api.http já existe, mantendo o arquivo atual."
+fi
 
-cat > .env.example <<'EON'
-# Este arquivo documenta variáveis usadas no projeto.
-# Copie para cada subprojeto conforme necessário.
-
-# FRONTEND
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-NEXT_PUBLIC_API_BASE_URL=
-NEXT_PUBLIC_DEMO_USER_ID=11111111-1111-1111-1111-111111111111
-
-# BACKEND
-ASPNETCORE_URLS=
-MONGODB_URI=
-MONGODB_DB=
-MONGODB_COLLECTION=
-SUPABASE_PG_HOST=
-SUPABASE_PG_DB=
-SUPABASE_PG_USER=
-SUPABASE_PG_PASS=
-SUPABASE_PG_PORT=
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
-OPENFOODFACTS_API_BASE=
-SEED=true
-EON
-
-cat > README.md <<'EON'
+# --- README E .env RAIZ ---
+if [ ! -f "README.md" ]; then
+  echo "📝 Criando README.md..."
+  cat > README.md <<'EON'
 # NutriScan
 
 Aplicação web (Next.js 16) + API .NET 8 + Supabase (Postgres/Auth) + MongoDB (produtos).
@@ -137,5 +150,38 @@ Acesse http://localhost:3000 (Next) e http://localhost:5000 (API).
 - MongoDB: Atlas
 
 EON
+else
+  echo "ℹ️  README.md já existe, mantendo o arquivo atual."
+fi
 
-echo "✅ Setup esqueleto concluído."
+if [ ! -f ".env.example" ]; then
+  echo "🧩 Gerando .env.example raiz..."
+  cat > .env.example <<'EON'
+# FRONTEND
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_API_BASE_URL=
+NEXT_PUBLIC_DEMO_USER_ID=11111111-1111-1111-1111-111111111111
+
+# BACKEND
+ASPNETCORE_URLS=
+MONGODB_URI=
+MONGODB_DB=
+MONGODB_COLLECTION=
+SUPABASE_PG_HOST=
+SUPABASE_PG_DB=
+SUPABASE_PG_USER=
+SUPABASE_PG_PASS=
+SUPABASE_PG_PORT=
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+OPENFOODFACTS_API_BASE=
+SEED=true
+EON
+fi
+
+echo "------------------------------------------"
+echo "✅ Setup concluído com sucesso!"
+echo "📁 Frontend: ./nutriscan-frontend"
+echo "📁 Backend: ./NutriScan.Api"
+echo "📁 Documentação: ./docs/api.http"
